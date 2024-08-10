@@ -29,7 +29,7 @@ public class HandleValidationExceptions {
                         .detalhes(e.getMessage())
                         .build();
 
-        log.info("Erro lançado {}", e.getMessage());
+        log.info("Erro lançado { }", e.getMessage());
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(erroCapturado);
     }
 
@@ -58,7 +58,7 @@ public class HandleValidationExceptions {
                         .detalhes(e.getMessage())
                         .build();
 
-        log.info("Erros", e.getMessage());
+        log.info("Erros {}", e.getMessage());
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(erroCapturado);
     }
 
@@ -75,7 +75,11 @@ public class HandleValidationExceptions {
                 .collect(Collectors.toList());
 
         constraintsViolated.addAll(
-                e.getBindingResult().getGlobalErrors().stream().map(error -> error.getDefaultMessage()).collect(Collectors.toList())
+                e.getBindingResult()
+                        .getGlobalErrors()
+                        .stream()
+                        .map(error -> error.getDefaultMessage())
+                        .collect(Collectors.toList())
         );
 
         ErrorDTO erroCapturado = ErrorDTO.builder()
@@ -84,7 +88,7 @@ public class HandleValidationExceptions {
                 .build();
 
 
-        log.info("Erros", constraintsViolated);
+        log.info("Erros {}", constraintsViolated);
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(erroCapturado);
     }
 

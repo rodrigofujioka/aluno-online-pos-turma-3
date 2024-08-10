@@ -3,6 +3,7 @@ package br.com.alunoonline.api.service;
 import br.com.alunoonline.api.client.ViaCepClient;
 import br.com.alunoonline.api.model.Aluno;
 import br.com.alunoonline.api.repository.AlunoRepository;
+import jakarta.annotation.security.RolesAllowed;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -27,18 +28,29 @@ public class AlunoService {
 
         alunoRepository.save(aluno);
         log.info("Encerrando Criação de aluno");
+    }
+
+    public void createAll(List<Aluno> listaAlunos){
+
+        alunoRepository.saveAll(listaAlunos);
 
     }
 
-    private void atualizaEnderecoPorCep(Aluno aluno) {
-        var cep = aluno.getEndereco().getCep();
-        var enderecoResponse = viaCepClient.consultaCep(cep);
+    public  void atualizaEnderecoPorCep(Aluno aluno) {
 
-        aluno.getEndereco().setLocalidade(enderecoResponse.getLocalidade());
-        aluno.getEndereco().setUf(enderecoResponse.getUf());
-        aluno.getEndereco().setBairro(enderecoResponse.getBairro());
-        aluno.getEndereco().setComplemento(enderecoResponse.getComplemento());
-        aluno.getEndereco().setLogradouro(enderecoResponse.getLogradouro());
+        var cep = aluno.getEndereco().getCep();
+        log.info("consultando Cep {} ", cep);
+        try {
+            var enderecoResponse = viaCepClient.consultaCep(cep);
+
+            aluno.getEndereco().setLocalidade(enderecoResponse.getLocalidade());
+            aluno.getEndereco().setUf(enderecoResponse.getUf());
+            aluno.getEndereco().setBairro(enderecoResponse.getBairro());
+            aluno.getEndereco().setComplemento(enderecoResponse.getComplemento());
+            aluno.getEndereco().setLogradouro(enderecoResponse.getLogradouro());
+        }catch (Exception e){
+            log.warn("Erro de integração, Cep não encontrado {} ", cep);
+        }
     }
 
     public List<Aluno> findAll() {
